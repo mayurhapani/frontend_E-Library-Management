@@ -1,19 +1,17 @@
 import { useState, useContext, useEffect, useCallback } from "react";
-import { FaCog, FaPlus } from "react-icons/fa";
+import { FaCog } from "react-icons/fa";
 import { AuthContext } from "../context/AuthProvider";
-import RecipeCard from "../components/RecipeCard";
-import AddRecipeModal from "../components/AddRecipeModal";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import ReturnBook from "../components/ReturnBook";
 
 export default function Profile() {
   const [showSettings, setShowSettings] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [recipes, setRecipes] = useState([]);
+  const [borrowedBooks, setBorrowedBooks] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
 
   const { isLoggedIn, user, logout, checkLoginStatus, setLoading } = useContext(AuthContext);
   const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -22,26 +20,15 @@ export default function Profile() {
 
   const fetchUserData = useCallback(async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/users/getUser`, {
+      const response = await axios.get(`${BASE_URL}/api/v1/users/getUser`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setName(response.data.data.name);
       setEmail(response.data.data.email);
+      setBorrowedBooks(response.data.data.borrowedBooks || []);
     } catch (error) {
       console.error("Error fetching user data:", error);
       toast.error("Failed to fetch user data");
-    }
-  }, [BASE_URL]);
-
-  const fetchUserRecipes = useCallback(async () => {
-    try {
-      const response = await axios.get(`${BASE_URL}/Recipes/getUserRecipes`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      setRecipes(response.data.data);
-    } catch (error) {
-      console.error("Error fetching user recipes:", error);
-      toast.error("Failed to fetch recipes");
     }
   }, [BASE_URL]);
 
@@ -50,7 +37,7 @@ export default function Profile() {
       setLoading(true);
       await checkLoginStatus();
       if (isLoggedIn) {
-        await Promise.all([fetchUserData(), fetchUserRecipes()]);
+        await fetchUserData();
       } else {
         navigate("/signin");
       }
@@ -58,7 +45,7 @@ export default function Profile() {
     };
 
     initializeProfile();
-  }, [isLoggedIn, navigate, fetchUserData, fetchUserRecipes, checkLoginStatus, setLoading]);
+  }, [isLoggedIn, navigate, fetchUserData, checkLoginStatus, setLoading]);
 
   if (!isLoggedIn || !user) {
     return null;
@@ -71,7 +58,7 @@ export default function Profile() {
   const confirmDeleteAccount = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${BASE_URL}/users/delete/${user?.name}`, {
+      await axios.delete(`${BASE_URL}/api/v1/users/delete/${user?._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -92,7 +79,7 @@ export default function Profile() {
     try {
       const token = localStorage.getItem("token");
       await axios.patch(
-        `${BASE_URL}/users/update/${user?.name}`,
+        `${BASE_URL}/api/v1/users/update/${user?._id}`,
         { name, email },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -102,32 +89,6 @@ export default function Profile() {
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error(error.response?.data?.message || "Error updating profile. Please try again.");
-    }
-  };
-
-  const handleAddRecipe = async (recipeData) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/Recipes/register`, recipeData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      toast.success("Recipe added successfully");
-      setShowAddRecipeModal(false);
-      fetchUserRecipes(); // Refresh the recipes list
-    } catch (error) {
-      console.error("Error adding recipe:", error);
-      toast.error(error.response?.data?.message || "Error adding recipe. Please try again.");
-    }
-  };
-
-  const handleDeleteRecipe = async (recipeId) => {
-    try {
-      // Implement the delete logic here
-      // For now, let's just remove it from the local state
-      setRecipes((prevRecipes) => prevRecipes.filter((recipe) => recipe._id !== recipeId));
-      toast.success("Recipe deleted successfully");
-    } catch (error) {
-      toast.error("Failed to delete recipe");
     }
   };
 
@@ -146,32 +107,30 @@ export default function Profile() {
         </div>
 
         <div className="mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold">My Recipes</h2>
-            <button
-              onClick={() => setShowAddRecipeModal(true)}
-              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors flex items-center"
-            >
-              <FaPlus className="mr-2" /> Add Recipe
-            </button>
-          </div>
-          {recipes.length > 0 ? (
+          <h2 className="text-2xl font-semibold mb-4">Borrowed Books</h2>
+          {borrowedBooks.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recipes.map((recipe) => (
-                <RecipeCard
-                  key={recipe._id}
-                  recipe={recipe}
-                  onDelete={handleDeleteRecipe}
-                  isProfilePage={true}
-                />
+              {borrowedBooks.map((book) => (
+                <div key={book._id} className="bg-white rounded-lg shadow-md p-4">
+                  <h3 className="text-xl font-semibold mb-2">{book.title}</h3>
+                  <p className="text-gray-600 mb-2">Author: {book.author}</p>
+                  <p className="text-gray-600 mb-2">
+                    Borrow Date: {new Date(book.borrowDate).toLocaleDateString()}
+                  </p>
+                  <p className="text-gray-600 mb-4">
+                    Return Date: {new Date(book.returnDate).toLocaleDateString()}
+                  </p>
+                  <ReturnBook bookId={book._id} onReturn={fetchUserData} />
+                </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-600">You haven&apos;t created any recipes yet.</p>
+            <p className="text-gray-600">You haven&apos;t borrowed any books yet.</p>
           )}
         </div>
       </div>
 
+      {/* Settings Modal */}
       {showSettings && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-8 max-w-md w-full">
@@ -229,6 +188,7 @@ export default function Profile() {
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
       {showDeleteConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
           <div className="bg-white rounded-lg p-8 max-w-md w-full">
@@ -252,13 +212,6 @@ export default function Profile() {
             </div>
           </div>
         </div>
-      )}
-
-      {showAddRecipeModal && (
-        <AddRecipeModal
-          onClose={() => setShowAddRecipeModal(false)}
-          onAddRecipe={handleAddRecipe}
-        />
       )}
     </div>
   );

@@ -14,8 +14,7 @@ export default function Signup() {
   const notify1 = (msg) => toast.error(msg);
   const notify2 = (msg) => toast.success(msg);
 
-  const emailRegex =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const passwordRegex = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/;
 
   const sendData = async (e) => {
@@ -26,13 +25,13 @@ export default function Signup() {
     }
     if (!passwordRegex.test(password)) {
       notify1(
-        "Invalid password format,  must contain a number, must contain one lowercase, must contain one uppercase, must contain one special character, password must be 8-16 characters long"
+        "Invalid password format. Password must be 8-16 characters long and include a number, lowercase letter, uppercase letter, and special character."
       );
       return;
     }
 
     try {
-      const response = await axios.post(`${BASE_URL}/users/register`, {
+      const response = await axios.post(`${BASE_URL}/api/v1/users/register`, {
         name,
         email,
         password,
@@ -46,64 +45,66 @@ export default function Signup() {
       } else {
         notify1(error.message);
       }
-      navigate("/signup");
     }
   };
 
   return (
-    <div className=" bg-red-200 h-screen">
-      <div className="container mx-auto ">
-        <div className="flex justify-center items-center h-screen">
-          <div className="bg-red-100 p-10 rounded-md text-center">
-            <h1 className="mb-5 text-2xl md:text-5xl font-bold text-gray-600">
-              Sundaram Enterprise
-            </h1>
-            <h2 className="mb-5 text-xl font-semibold text-gray-600">
-              Complete Your Tasks With Us
-            </h2>
-            <form className="flex flex-col gap-2" onSubmit={sendData}>
-              <input
-                className="mb-3 p-2 rounded-sm"
-                type="text"
-                placeholder="Username"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                }}
-                name="name"
-              />
-              <input
-                className="mb-3 p-2 rounded-sm"
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
-                name="email"
-              />
-              <input
-                className="mb-3 p-2 rounded-sm"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                }}
-                name="password"
-              />
-              <button className=" bg-blue-500 text-white rounded-md py-1 my-4" type="submit">
-                Sign up
-              </button>
-              <p>
-                Already have an account?{" "}
-                <Link className="text-blue-600" to="/signin">
-                  Sign in
-                </Link>
-              </p>
-            </form>
+    <div className="bg-gradient-to-r from-blue-100 to-indigo-100 min-h-screen flex items-center justify-center">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 className="text-3xl font-bold text-center text-indigo-700 mb-6">E-Library Sign Up</h1>
+        <form className="space-y-4" onSubmit={sendData}>
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              Name
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              required
+            />
           </div>
-        </div>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 text-white rounded-md py-2 px-4 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
+          >
+            Sign Up
+          </button>
+        </form>
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Already have an account?{" "}
+          <Link to="/signin" className="text-indigo-600 hover:text-indigo-500">
+            Sign In
+          </Link>
+        </p>
       </div>
     </div>
   );

@@ -2,11 +2,11 @@ import { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import axios from "axios";
 import { toast } from "react-toastify";
-import RecipeCard from "../components/RecipeCard";
+import BookCard from "../components/BookCard";
 
 export default function Home() {
-  const [recipes, setRecipes] = useState([]);
-  const [cuisines, setCuisines] = useState([]);
+  const [books, setBooks] = useState([]);
+  const [genres, setGenres] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const { isLoggedIn, user, loading } = useContext(AuthContext);
@@ -14,49 +14,44 @@ export default function Home() {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
-    // Fetch recipes when component mounts
-    const fetchRecipes = async () => {
+    const fetchBooks = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/Recipes/getAllRecipes`);
-        const fetchedRecipes = response.data.data;
-        setRecipes(fetchedRecipes);
+        const response = await axios.get(`${BASE_URL}/api/v1/books`);
+        const fetchedBooks = response.data.data;
+        setBooks(fetchedBooks);
 
-        // Extract unique cuisines
-        const uniqueCuisines = [
-          ...new Set(fetchedRecipes.map((recipe) => recipe.cuisine).filter(Boolean)),
-        ];
-        setCuisines(uniqueCuisines);
+        const uniqueGenres = [...new Set(fetchedBooks.map((book) => book.genre).filter(Boolean))];
+        setGenres(uniqueGenres);
       } catch (error) {
-        toast.error("Failed to fetch recipes");
+        toast.error("Failed to fetch books");
       }
     };
 
-    fetchRecipes();
+    fetchBooks();
   }, [BASE_URL]);
 
-  const filteredRecipes = recipes.filter((recipe) => {
-    const cuisineMatch =
-      recipe.cuisine && recipe.cuisine.toLowerCase().includes(searchTerm.toLowerCase());
-    const titleMatch =
-      recipe.title && recipe.title.toLowerCase().includes(searchTerm.toLowerCase());
-    return cuisineMatch || titleMatch;
+  const filteredBooks = books.filter((book) => {
+    const genreMatch = book.genre && book.genre.toLowerCase().includes(searchTerm.toLowerCase());
+    const titleMatch = book.title && book.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const authorMatch = book.author && book.author.toLowerCase().includes(searchTerm.toLowerCase());
+    return genreMatch || titleMatch || authorMatch;
   });
 
   if (loading) {
-    return <div>Loading...</div>; // Or a more sophisticated loading component
+    return <div>Loading...</div>;
   }
 
   return (
-    <div className="bg-gradient-to-r from-orange-100 to-yellow-100 min-h-screen">
+    <div className="bg-gradient-to-r from-blue-100 to-indigo-100 min-h-screen">
       <div className="container mx-auto px-4 pt-20 pb-8">
-        <h1 className="text-4xl font-bold text-center text-orange-800 mb-8">
-          Delicious Recipes from Around the World
+        <h1 className="text-4xl font-bold text-center text-indigo-800 mb-8">
+          E-Library Management System
         </h1>
 
         {isLoggedIn ? (
           <p className="text-center mb-8">Welcome back, {user?.name}!</p>
         ) : (
-          <p className="text-center mb-8">Please sign in to manage your recipes.</p>
+          <p className="text-center mb-8">Please sign in to borrow books.</p>
         )}
 
         {/* Search input */}
@@ -83,7 +78,7 @@ export default function Home() {
                 className="peer h-full w-full outline-none text-sm text-gray-700 pr-2"
                 type="text"
                 id="search"
-                placeholder="Search cuisines or recipes..."
+                placeholder="Search books by title, author, or genre..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -91,26 +86,26 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Cuisine tags */}
+        {/* Genre tags */}
         <div className="flex flex-wrap justify-center gap-2 mb-8">
-          {cuisines.map((cuisine) => (
+          {genres.map((genre) => (
             <button
-              key={cuisine}
-              onClick={() => setSearchTerm(cuisine)}
-              className="px-4 py-2 text-sm font-medium bg-white text-orange-700 hover:bg-orange-50 border border-orange-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500"
+              key={genre}
+              onClick={() => setSearchTerm(genre)}
+              className="px-4 py-2 text-sm font-medium bg-white text-indigo-700 hover:bg-indigo-50 border border-indigo-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              {cuisine}
+              {genre}
             </button>
           ))}
         </div>
 
-        {/* Recipe grid */}
+        {/* Book grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredRecipes.length > 0 ? (
-            filteredRecipes.map((recipe) => <RecipeCard key={recipe._id} recipe={recipe} />)
+          {filteredBooks.length > 0 ? (
+            filteredBooks.map((book) => <BookCard key={book._id} book={book} />)
           ) : (
             <p className="text-center col-span-full text-gray-600">
-              No recipes found for &ldquo;{searchTerm}&rdquo;.
+              No books found for &ldquo;{searchTerm}&rdquo;.
             </p>
           )}
         </div>
