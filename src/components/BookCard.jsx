@@ -7,7 +7,15 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import BorrowBook from "./BorrowBook";
 
-const BookCard = ({ book, onBookDeleted, onBookBorrowed, isBorrowed, onReturnBook, returningBookId, isProfilePage }) => {
+const BookCard = ({
+  book,
+  onBookDeleted,
+  onBookBorrowed,
+  isBorrowed,
+  onReturnBook,
+  returningBookId,
+  isProfilePage,
+}) => {
   const { userRole } = useContext(AuthContext);
   const isAdmin = userRole === "admin";
   const navigate = useNavigate();
@@ -95,10 +103,10 @@ const BookCard = ({ book, onBookDeleted, onBookBorrowed, isBorrowed, onReturnBoo
                 onClick={() => onReturnBook(book._id)}
                 disabled={returningBookId === book._id}
                 className={`inline-block bg-green-500 text-white px-3 py-1 text-sm rounded-md hover:bg-green-600 transition duration-300 ${
-                  returningBookId === book._id ? 'opacity-50 cursor-not-allowed' : ''
+                  returningBookId === book._id ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                {returningBookId === book._id ? 'Returning...' : 'Return Book'}
+                {returningBookId === book._id ? "Returning..." : "Return Book"}
               </button>
             </>
           ) : isBorrowed ? (

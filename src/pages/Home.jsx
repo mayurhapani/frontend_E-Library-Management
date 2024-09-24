@@ -1,4 +1,4 @@
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useContext, useState, useCallback } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -14,6 +14,20 @@ export default function Home() {
 
   const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+  const fetchBorrowedBooks = useCallback(async () => {
+    if (isLoggedIn) {
+      try {
+        const response = await axios.get(`${BASE_URL}/users/getUser`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        const borrowedBooks = response.data.data.borrowedBooks || [];
+        setBorrowedBookIds(borrowedBooks.map((book) => book.book._id));
+      } catch (error) {
+        console.error("Error fetching borrowed books:", error);
+      }
+    }
+  }, [BASE_URL, isLoggedIn]);
+
   useEffect(() => {
     const fetchBooks = async () => {
       try {
@@ -28,23 +42,13 @@ export default function Home() {
       }
     };
 
-    const fetchBorrowedBooks = async () => {
-      if (isLoggedIn) {
-        try {
-          const response = await axios.get(`${BASE_URL}/users/getUser`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-          });
-          const borrowedBooks = response.data.data.borrowedBooks || [];
-          setBorrowedBookIds(borrowedBooks.map((book) => book.book._id));
-        } catch (error) {
-          console.error("Error fetching borrowed books:", error);
-        }
-      }
-    };
-
     fetchBooks();
     fetchBorrowedBooks();
-  }, [BASE_URL, isLoggedIn]);
+  }, [BASE_URL, isLoggedIn, fetchBorrowedBooks]);
+
+  const handleBookBorrowed = useCallback((borrowedBookId) => {
+    setBorrowedBookIds(prevIds => [...prevIds, borrowedBookId]);
+  }, []);
 
   const filteredBooks = books.filter((book) => {
     const genreMatch = book.genre && book.genre.toLowerCase().includes(searchTerm.toLowerCase());
@@ -127,6 +131,7 @@ export default function Home() {
                 key={book._id}
                 book={book}
                 onBookDeleted={handleBookDeleted}
+                onBookBorrowed={handleBookBorrowed}
                 isBorrowed={borrowedBookIds.includes(book._id)}
               />
             ))
