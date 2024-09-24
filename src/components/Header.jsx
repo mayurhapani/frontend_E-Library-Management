@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthProvider";
-import { FaUser, FaSignOutAlt, FaCaretDown } from "react-icons/fa";
+import { FaUser, FaSignOutAlt, FaCaretDown, FaBook } from "react-icons/fa";
 
 export default function Header() {
   const { isLoggedIn, userName, logout } = useContext(AuthContext);
@@ -16,60 +16,65 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-gradient-to-r from-orange-500 to-yellow-500 fixed top-0 left-0 right-0 shadow-lg z-50">
+      <header className="bg-gradient-to-r from-blue-600 to-indigo-700 fixed top-0 left-0 right-0 shadow-lg z-50">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-4">
             <Link
               to="/"
-              className="text-2xl md:text-3xl font-bold text-white hover:text-yellow-200 transition duration-300"
+              className="text-2xl md:text-3xl font-bold text-white hover:text-indigo-200 transition duration-300 flex items-center"
             >
-              Sundaram Enterprise
+              <FaBook className="mr-2" />
+              E-Library
             </Link>
             <nav>
               <ul className="flex items-center space-x-6">
                 <li>
-                  <Link to="/" className="text-white hover:text-yellow-200 transition duration-300">
+                  <Link to="/" className="text-white hover:text-indigo-200 transition duration-300">
                     Home
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    to="/books"
+                    className="text-white hover:text-indigo-200 transition duration-300"
+                  >
+                    Books
+                  </Link>
+                </li>
                 {isLoggedIn ? (
-                  <>
-                    <li>
-                      <Link
-                        to="/profile"
-                        className="text-white hover:text-yellow-200 transition duration-300"
-                      >
-                        Profile
-                      </Link>
-                    </li>
-                    <li className="relative">
-                      <button
-                        onClick={() => setShowUserMenu(!showUserMenu)}
-                        className="flex items-center space-x-2 text-white hover:text-yellow-200 transition duration-300"
-                      >
-                        <FaUser />
-                        <span className="font-semibold">{userName}</span>
-                        <FaCaretDown />
-                      </button>
-                      {showUserMenu && (
-                        <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-50">
-                          <button
-                            onClick={() => setLogoutModal(true)}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-500 hover:text-white w-full text-left transition duration-300"
-                          >
-                            <FaSignOutAlt className="inline-block mr-2" />
-                            Logout
-                          </button>
-                        </div>
-                      )}
-                    </li>
-                  </>
+                  <li className="relative">
+                    <button
+                      onClick={() => setShowUserMenu(!showUserMenu)}
+                      className="flex items-center space-x-2 text-white hover:text-indigo-200 transition duration-300"
+                    >
+                      <FaUser />
+                      <span className="font-semibold">{userName}</span>
+                      <FaCaretDown />
+                    </button>
+                    {showUserMenu && (
+                      <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-50">
+                        <Link
+                          to="/profile"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-500 hover:text-white transition duration-300"
+                        >
+                          Profile
+                        </Link>
+                        <button
+                          onClick={() => setLogoutModal(true)}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-500 hover:text-white w-full text-left transition duration-300"
+                        >
+                          <FaSignOutAlt className="inline-block mr-2" />
+                          Logout
+                        </button>
+                      </div>
+                    )}
+                  </li>
                 ) : (
                   <>
                     <li>
                       <Link
                         to="/signin"
-                        className="text-white hover:text-yellow-200 transition duration-300"
+                        className="text-white hover:text-indigo-200 transition duration-300"
                       >
                         Sign In
                       </Link>
@@ -77,7 +82,7 @@ export default function Header() {
                     <li>
                       <Link
                         to="/signup"
-                        className="text-white hover:text-yellow-200 transition duration-300"
+                        className="text-white hover:text-indigo-200 transition duration-300"
                       >
                         Sign Up
                       </Link>
@@ -98,7 +103,7 @@ export default function Header() {
             <div className="flex justify-evenly">
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 text-white bg-orange-500 rounded-md hover:bg-orange-600 transition duration-300"
+                className="px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-indigo-600 transition duration-300"
               >
                 Log Out
               </button>
