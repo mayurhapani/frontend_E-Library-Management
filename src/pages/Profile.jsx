@@ -4,8 +4,8 @@ import { AuthContext } from "../context/AuthProvider";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import ReturnBook from "../components/ReturnBook";
-import GlobalLoader from "../components/GlobalLoader"; // Import the GlobalLoader component
+import GlobalLoader from "../components/GlobalLoader";
+import BookCard from "../components/BookCard";
 
 export default function Profile() {
   const [showSettings, setShowSettings] = useState(false);
@@ -13,7 +13,8 @@ export default function Profile() {
   const [borrowedBooks, setBorrowedBooks] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(true); // Add a loading state
+  const [isLoading, setIsLoading] = useState(true);
+  const [returningBookId, setReturningBookId] = useState(null);
 
   const {
     isLoggedIn,
@@ -110,6 +111,26 @@ export default function Profile() {
     }
   };
 
+  const handleReturnBook = async (bookId) => {
+    setReturningBookId(bookId);
+    try {
+      await axios.post(
+        `${BASE_URL}/books/${bookId}/return`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+      toast.success("Book returned successfully");
+      fetchUserData(); // Refresh the borrowed books list
+    } catch (error) {
+      console.error("Error returning book:", error);
+      toast.error("Failed to return book");
+    } finally {
+      setReturningBookId(null);
+    }
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen pt-20">
       <div className="container mx-auto px-4">
@@ -129,16 +150,19 @@ export default function Profile() {
           {borrowedBooks.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {borrowedBooks.map((book) => (
-                <div key={book._id} className="bg-white rounded-lg shadow-md p-4">
-                  <h3 className="text-xl font-semibold mb-2">{book.title}</h3>
-                  <p className="text-gray-600 mb-2">Author: {book.author}</p>
-                  <p className="text-gray-600 mb-2">
-                    Borrow Date: {new Date(book.borrowDate).toLocaleDateString()}
-                  </p>
-                  <p className="text-gray-600 mb-4">
-                    Return Date: {new Date(book.returnDate).toLocaleDateString()}
-                  </p>
-                  <ReturnBook bookId={book._id} onReturn={fetchUserData} />
+                <div key={book._id} className="relative">
+                  <BookCard
+                    book={book.book}
+                    isBorrowed={true}
+                    onReturnBook={handleReturnBook}
+                    returningBookId={returningBookId}
+                    isProfilePage={true}
+                  />
+                  <div className="absolute top-4 right-4 bg-white px-2 py-1 rounded-md shadow-md">
+                    <p className="text-xs font-semibold">
+                      Return by: {new Date(book.returnDate).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>

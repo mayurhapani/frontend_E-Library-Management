@@ -8,6 +8,7 @@ export default function Home() {
   const [books, setBooks] = useState([]);
   const [genres, setGenres] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [borrowedBookIds, setBorrowedBookIds] = useState([]);
 
   const { isLoggedIn, user, loading } = useContext(AuthContext);
 
@@ -27,8 +28,23 @@ export default function Home() {
       }
     };
 
+    const fetchBorrowedBooks = async () => {
+      if (isLoggedIn) {
+        try {
+          const response = await axios.get(`${BASE_URL}/users/getUser`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          });
+          const borrowedBooks = response.data.data.borrowedBooks || [];
+          setBorrowedBookIds(borrowedBooks.map((book) => book.book._id));
+        } catch (error) {
+          console.error("Error fetching borrowed books:", error);
+        }
+      }
+    };
+
     fetchBooks();
-  }, [BASE_URL]);
+    fetchBorrowedBooks();
+  }, [BASE_URL, isLoggedIn]);
 
   const filteredBooks = books.filter((book) => {
     const genreMatch = book.genre && book.genre.toLowerCase().includes(searchTerm.toLowerCase());
@@ -42,7 +58,7 @@ export default function Home() {
   }
 
   const handleBookDeleted = (deletedBookId) => {
-    setBooks(prevBooks => prevBooks.filter(book => book._id !== deletedBookId));
+    setBooks((prevBooks) => prevBooks.filter((book) => book._id !== deletedBookId));
   };
 
   return (
@@ -106,7 +122,14 @@ export default function Home() {
         {/* Book grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredBooks.length > 0 ? (
-            filteredBooks.map((book) => <BookCard key={book._id} book={book} onBookDeleted={handleBookDeleted} />)
+            filteredBooks.map((book) => (
+              <BookCard
+                key={book._id}
+                book={book}
+                onBookDeleted={handleBookDeleted}
+                isBorrowed={borrowedBookIds.includes(book._id)}
+              />
+            ))
           ) : (
             <p className="text-center col-span-full text-gray-600">
               No books found for &ldquo;{searchTerm}&rdquo;.

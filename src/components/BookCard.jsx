@@ -1,16 +1,18 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
 import { toast } from "react-toastify";
+import BorrowBook from "./BorrowBook";
 
-const BookCard = ({ book, onBookDeleted }) => {
+const BookCard = ({ book, onBookDeleted, onBookBorrowed, isBorrowed, onReturnBook, returningBookId, isProfilePage }) => {
   const { userRole } = useContext(AuthContext);
   const isAdmin = userRole === "admin";
   const navigate = useNavigate();
   const BASE_URL = import.meta.env.VITE_BASE_URL;
+  const [showBorrowModal, setShowBorrowModal] = useState(false);
 
   const handleEditBook = () => {
     navigate(`/edit-book/${book._id}`);
@@ -33,14 +35,21 @@ const BookCard = ({ book, onBookDeleted }) => {
     }
   };
 
+  const handleBorrowClick = () => {
+    setShowBorrowModal(true);
+  };
+
+  const handleBorrowSuccess = () => {
+    setShowBorrowModal(false);
+    if (onBookBorrowed) {
+      onBookBorrowed(book._id);
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105">
       <div className="h-80 bg-gray-100 flex items-center justify-center">
-        <img 
-          src={book?.image} 
-          alt={book?.title} 
-          className="max-w-full max-h-full object-contain"
-        />
+        <img src={book?.image} alt={book?.title} className="max-w-full max-h-full object-contain" />
       </div>
       <div className="p-4">
         <h2 className="text-xl font-semibold mb-2 text-gray-800 truncate">{book?.title}</h2>
@@ -49,32 +58,77 @@ const BookCard = ({ book, onBookDeleted }) => {
           <p className="text-xs text-gray-500">{book?.genre}</p>
         </div>
         <div className="flex justify-between items-center">
-          <Link
-            to={`/books/${book?._id}`}
-            className="inline-block bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600 transition duration-300"
-          >
-            View Details
-          </Link>
-          {isAdmin && (
-            <div className="flex space-x-2">
+          {isAdmin ? (
+            <>
               <button
-                onClick={handleEditBook}
-                className="text-yellow-500 hover:text-yellow-600 transition duration-300"
-                title="Edit book"
+                onClick={() => navigate(`/books/${book?._id}`)}
+                className="inline-block bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600 transition duration-300"
               >
-                <FaEdit size={16} />
+                View Details
+              </button>
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleEditBook}
+                  className="text-yellow-500 hover:text-yellow-600 transition duration-300"
+                  title="Edit book"
+                >
+                  <FaEdit size={16} />
+                </button>
+                <button
+                  onClick={handleDeleteBook}
+                  className="text-red-500 hover:text-red-600 transition duration-300"
+                  title="Delete book"
+                >
+                  <FaTrash size={16} />
+                </button>
+              </div>
+            </>
+          ) : isProfilePage && isBorrowed ? (
+            <>
+              <button
+                onClick={() => navigate(`/books/${book?._id}`)}
+                className="inline-block bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600 transition duration-300"
+              >
+                View Details
               </button>
               <button
-                onClick={handleDeleteBook}
-                className="text-red-500 hover:text-red-600 transition duration-300"
-                title="Delete book"
+                onClick={() => onReturnBook(book._id)}
+                disabled={returningBookId === book._id}
+                className={`inline-block bg-green-500 text-white px-3 py-1 text-sm rounded-md hover:bg-green-600 transition duration-300 ${
+                  returningBookId === book._id ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                <FaTrash size={16} />
+                {returningBookId === book._id ? 'Returning...' : 'Return Book'}
               </button>
-            </div>
+            </>
+          ) : isBorrowed ? (
+            <button
+              onClick={() => navigate(`/books/${book?._id}`)}
+              className="inline-block bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600 transition duration-300"
+            >
+              View Details
+            </button>
+          ) : (
+            <button
+              onClick={handleBorrowClick}
+              className="inline-block bg-green-500 text-white px-3 py-1 text-sm rounded-md hover:bg-green-600 transition duration-300"
+            >
+              Borrow
+            </button>
           )}
         </div>
       </div>
+      {showBorrowModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg">
+            <BorrowBook
+              bookId={book._id}
+              onSuccess={handleBorrowSuccess}
+              onCancel={() => setShowBorrowModal(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -88,6 +142,11 @@ BookCard.propTypes = {
     genre: PropTypes.string,
   }).isRequired,
   onBookDeleted: PropTypes.func,
+  onBookBorrowed: PropTypes.func,
+  isBorrowed: PropTypes.bool,
+  onReturnBook: PropTypes.func,
+  returningBookId: PropTypes.string,
+  isProfilePage: PropTypes.bool,
 };
 
 export default BookCard;
