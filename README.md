@@ -9,7 +9,7 @@ Currently, two official plugins are available:
 
 VITE_BASE_URL=http://localhost:8001
 
-live url =
+live url = https://frontend-e-library-management.vercel.app/
 
 admin email = hapanimayur@gmail.com
 password = Mayur@123

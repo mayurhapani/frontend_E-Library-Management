@@ -11,7 +11,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
-  const [userRole, setUserRole] = useState(""); // Add this line
+  const [userRole, setUserRole] = useState("");
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
+
       if (token) {
         const response = await axios.get(`${BASE_URL}/users/getUser`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -28,16 +29,20 @@ export const AuthProvider = ({ children }) => {
         setUser(response.data.data);
         setIsLoggedIn(true);
         setUserName(response.data.data.name);
-        setUserRole(response.data.data.role); // Add this line
+        setUserRole(response.data.data.role);
       } else {
         setIsLoggedIn(false);
         setUser(null);
+        setUserName("");
+        setUserRole("");
       }
     } catch (error) {
       console.error("Error checking login status:", error);
       setIsLoggedIn(false);
       setUser(null);
-      localStorage.removeItem("token"); // Clear the token if there's an error
+      setUserName("");
+      setUserRole("");
+      localStorage.removeItem("token");
     } finally {
       setLoading(false);
     }
@@ -65,6 +70,7 @@ export const AuthProvider = ({ children }) => {
       console.log("Login response:", response.data);
       if (response.data.success) {
         localStorage.setItem("token", response.data.data.token);
+
         setIsLoggedIn(true);
         setUser(response.data.data.user);
         setUserName(response.data.data.user.name);
@@ -85,9 +91,18 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem("token");
       setIsLoggedIn(false);
       setUser(null);
+      setUserName("");
+      setUserRole("");
       console.log("Logout successful");
     } catch (error) {
       console.error("Logout error:", error.response ? error.response.data : error.message);
+    } finally {
+      // Ensure state is reset even if the logout request fails
+      localStorage.removeItem("token");
+      setIsLoggedIn(false);
+      setUser(null);
+      setUserName("");
+      setUserRole("");
     }
   };
 
