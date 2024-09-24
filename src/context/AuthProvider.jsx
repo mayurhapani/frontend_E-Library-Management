@@ -21,16 +21,19 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
+      console.log("11");
 
       if (token) {
         const response = await axios.get(`${BASE_URL}/users/getUser`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        console.log("22");
         setUser(response.data.data);
         setIsLoggedIn(true);
         setUserName(response.data.data.name);
         setUserRole(response.data.data.role);
       } else {
+        console.log("33");
         setIsLoggedIn(false);
         setUser(null);
         setUserName("");
