@@ -32,9 +32,9 @@ export default function Profile() {
       const response = await axios.get(`${BASE_URL}/users/getUser`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      setName(response.data.data.name);
-      setEmail(response.data.data.email);
-      setBorrowedBooks(response.data.data.borrowedBooks || []);
+      setName(response?.data?.data?.name);
+      setEmail(response?.data?.data?.email);
+      setBorrowedBooks(response?.data?.data?.borrowedBooks || []);
     } catch (error) {
       console.error("Error fetching user data:", error);
       toast.error("Failed to fetch user data");
@@ -142,14 +142,14 @@ export default function Profile() {
             <FaCog size={24} />
           </button>
           <h1 className="text-3xl font-bold mb-4">{user?.name}&apos;s Profile</h1>
-          <p className="text-gray-600">Email: {email}</p>
+          <p className="text-gray-600">Email: {user?.email}</p>
         </div>
 
         <div className="mb-6">
           <h2 className="text-2xl font-semibold mb-4">Borrowed Books</h2>
-          {borrowedBooks.length > 0 ? (
+          {borrowedBooks?.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {borrowedBooks.map((book) => (
+              {borrowedBooks?.map((book) => (
                 <div key={book._id} className="relative">
                   <BookCard
                     book={book.book}

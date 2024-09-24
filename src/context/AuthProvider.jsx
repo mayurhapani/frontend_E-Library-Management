@@ -27,11 +27,11 @@ export const AuthProvider = ({ children }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log("User data response:", response.data);
-        if (response.data && response.data.data) {
-          setUser(response.data.data);
+        if (response?.data && response?.data?.data) {
+          setUser(response?.data?.data);
           setIsLoggedIn(true);
-          setUserName(response.data.data.name || "");
-          setUserRole(response.data.data.role || "");
+          setUserName(response?.data?.data?.name || "");
+          setUserRole(response?.data?.data?.role || "");
         } else {
           throw new Error("Invalid user data received");
         }
