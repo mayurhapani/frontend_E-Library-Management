@@ -60,23 +60,33 @@ const BookCard = ({
   };
 
   const renderActionButtons = () => {
-    if (isAdmin && isProfilePage) {
+    if (isAdmin) {
       return (
-        <div className="flex space-x-2">
-          <button
-            onClick={handleEditBook}
-            className="text-yellow-500 hover:text-yellow-600 transition duration-300"
-            title="Edit book"
-          >
-            <FaEdit size={16} />
-          </button>
-          <button
-            onClick={handleDeleteBook}
-            className="text-red-500 hover:text-red-600 transition duration-300"
-            title="Delete book"
-          >
-            <FaTrash size={16} />
-          </button>
+        <div className="flex justify-between items-center w-full">
+          <div>
+            <button
+              onClick={() => navigate(`/books/${book?._id}`)}
+              className="inline-block bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600 transition duration-300 mr-2"
+            >
+              View Details
+            </button>
+          </div>
+          <div className="flex space-x-2">
+            <button
+              onClick={handleEditBook}
+              className="text-yellow-500 hover:text-yellow-600 transition duration-300"
+              title="Edit book"
+            >
+              <FaEdit size={16} />
+            </button>
+            <button
+              onClick={handleDeleteBook}
+              className="text-red-500 hover:text-red-600 transition duration-300"
+              title="Delete book"
+            >
+              <FaTrash size={16} />
+            </button>
+          </div>
         </div>
       );
     }
@@ -114,7 +124,7 @@ const BookCard = ({
       );
     }
 
-    if (isLoggedIn) {
+    if (isLoggedIn && !isAdmin) {
       return (
         <button
           onClick={handleBorrowClick}
