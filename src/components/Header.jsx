@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import { FaUser, FaSignOutAlt, FaCaretDown, FaBook } from "react-icons/fa";
 
@@ -7,6 +7,7 @@ export default function Header() {
   const { isLoggedIn, userName, userRole, logout } = useContext(AuthContext);
   const [logoutModal, setLogoutModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef(null);
 
   const handleLogout = async () => {
     await logout();
@@ -14,7 +15,20 @@ export default function Header() {
     setShowUserMenu(false);
   };
 
-  const isAdmin = userRole === 'admin';
+  const isAdmin = userRole === "admin";
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <>
@@ -46,7 +60,7 @@ export default function Header() {
                   </li>
                 )}
                 {isLoggedIn ? (
-                  <li className="relative">
+                  <li className="relative" ref={userMenuRef}>
                     <button
                       onClick={() => setShowUserMenu(!showUserMenu)}
                       className="flex items-center space-x-2 text-white hover:text-indigo-200 transition duration-300"

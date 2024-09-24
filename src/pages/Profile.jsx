@@ -5,6 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ReturnBook from "../components/ReturnBook";
+import GlobalLoader from "../components/GlobalLoader"; // Import the GlobalLoader component
 
 export default function Profile() {
   const [showSettings, setShowSettings] = useState(false);
@@ -12,8 +13,15 @@ export default function Profile() {
   const [borrowedBooks, setBorrowedBooks] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(true); // Add a loading state
 
-  const { isLoggedIn, user, logout, checkLoginStatus, setLoading } = useContext(AuthContext);
+  const {
+    isLoggedIn,
+    user,
+    logout,
+    checkLoginStatus,
+    loading: authLoading,
+  } = useContext(AuthContext);
   const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   const navigate = useNavigate();
@@ -29,26 +37,36 @@ export default function Profile() {
     } catch (error) {
       console.error("Error fetching user data:", error);
       toast.error("Failed to fetch user data");
+    } finally {
+      setIsLoading(false); // Set loading to false after data is fetched
     }
   }, [BASE_URL]);
 
   useEffect(() => {
     const initializeProfile = async () => {
-      setLoading(true);
-      await checkLoginStatus();
-      if (isLoggedIn) {
-        await fetchUserData();
-      } else {
-        navigate("/signin");
+      if (!authLoading) {
+        if (isLoggedIn) {
+          await fetchUserData();
+        } else {
+          navigate("/signin");
+        }
       }
-      setLoading(false);
     };
 
     initializeProfile();
-  }, [isLoggedIn, navigate, fetchUserData, checkLoginStatus, setLoading]);
+  }, [isLoggedIn, navigate, fetchUserData, authLoading]);
+
+  if (authLoading || isLoading) {
+    return <GlobalLoader />;
+  }
 
   if (!isLoggedIn || !user) {
     return null;
+  }
+
+  // Show loading indicator while data is being fetched
+  if (isLoading) {
+    return <GlobalLoader />;
   }
 
   const handleDeleteAccount = () => {
