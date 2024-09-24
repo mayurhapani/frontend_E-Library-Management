@@ -41,6 +41,10 @@ export default function Home() {
     return <div>Loading...</div>;
   }
 
+  const handleBookDeleted = (deletedBookId) => {
+    setBooks(prevBooks => prevBooks.filter(book => book._id !== deletedBookId));
+  };
+
   return (
     <div className="bg-gradient-to-r from-blue-100 to-indigo-100 min-h-screen">
       <div className="container mx-auto px-4 pt-20 pb-8">
@@ -102,7 +106,7 @@ export default function Home() {
         {/* Book grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredBooks.length > 0 ? (
-            filteredBooks.map((book) => <BookCard key={book._id} book={book} />)
+            filteredBooks.map((book) => <BookCard key={book._id} book={book} onBookDeleted={handleBookDeleted} />)
           ) : (
             <p className="text-center col-span-full text-gray-600">
               No books found for &ldquo;{searchTerm}&rdquo;.

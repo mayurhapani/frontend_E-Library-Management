@@ -17,14 +17,18 @@ const ManageBooks = () => {
   const uploadImage = async () => {
     const dataImage = new FormData();
     dataImage.append("file", image);
-    dataImage.append("upload_preset", "instaClone"); // Replace with your upload preset
-    dataImage.append("cloud_name", "mayurcloud21"); // Replace with your cloud name
-    dataImage.append("folder", "e-library"); // Replace with your desired folder name
+    dataImage.append("upload_preset", "instaClone");
+    dataImage.append("cloud_name", "mayurcloud21");
+    dataImage.append("folder", "e-library");
 
     try {
       const response = await axios.post(
-        "https://api.cloudinary.com/v1_1/mayurcloud21/upload", // Replace with your cloud name
-        dataImage
+        "https://api.cloudinary.com/v1_1/mayurcloud21/upload",
+        dataImage,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: false,
+        }
       );
       return response.data.url;
     } catch (error) {
