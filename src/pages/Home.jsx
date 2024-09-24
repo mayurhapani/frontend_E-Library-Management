@@ -47,13 +47,14 @@ export default function Home() {
   }, [BASE_URL, isLoggedIn, fetchBorrowedBooks]);
 
   const handleBookBorrowed = useCallback((borrowedBookId) => {
-    setBorrowedBookIds(prevIds => [...prevIds, borrowedBookId]);
+    setBorrowedBookIds((prevIds) => [...prevIds, borrowedBookId]);
   }, []);
 
   const filteredBooks = books.filter((book) => {
-    const genreMatch = book.genre && book.genre.toLowerCase().includes(searchTerm.toLowerCase());
-    const titleMatch = book.title && book.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const authorMatch = book.author && book.author.toLowerCase().includes(searchTerm.toLowerCase());
+    const genreMatch = book?.genre && book?.genre.toLowerCase().includes(searchTerm.toLowerCase());
+    const titleMatch = book?.title && book?.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const authorMatch =
+      book?.author && book?.author.toLowerCase().includes(searchTerm.toLowerCase());
     return genreMatch || titleMatch || authorMatch;
   });
 
@@ -62,7 +63,7 @@ export default function Home() {
   }
 
   const handleBookDeleted = (deletedBookId) => {
-    setBooks((prevBooks) => prevBooks.filter((book) => book._id !== deletedBookId));
+    setBooks((prevBooks) => prevBooks?.filter((book) => book._id !== deletedBookId));
   };
 
   return (
@@ -112,7 +113,7 @@ export default function Home() {
 
         {/* Genre tags */}
         <div className="flex flex-wrap justify-center gap-2 mb-8">
-          {genres.map((genre) => (
+          {genres?.map((genre) => (
             <button
               key={genre}
               onClick={() => setSearchTerm(genre)}
@@ -125,8 +126,8 @@ export default function Home() {
 
         {/* Book grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredBooks.length > 0 ? (
-            filteredBooks.map((book) => (
+          {filteredBooks?.length > 0 ? (
+            filteredBooks?.map((book) => (
               <BookCard
                 key={book._id}
                 book={book}

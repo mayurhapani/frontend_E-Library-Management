@@ -21,23 +21,20 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      console.log("11");
-
       if (token) {
         const response = await axios.get(`${BASE_URL}/users/getUser`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("22");
-        setUser(response.data.data);
-        setIsLoggedIn(true);
-        setUserName(response.data.data.name);
-        setUserRole(response.data.data.role);
+        if (response.data && response.data.data) {
+          setUser(response.data.data);
+          setIsLoggedIn(true);
+          setUserName(response.data.data.name || "");
+          setUserRole(response.data.data.role || "");
+        } else {
+          throw new Error("Invalid user data received");
+        }
       } else {
-        console.log("33");
-        setIsLoggedIn(false);
-        setUser(null);
-        setUserName("");
-        setUserRole("");
+        throw new Error("No token found");
       }
     } catch (error) {
       console.error("Error checking login status:", error);
@@ -55,14 +52,6 @@ export const AuthProvider = ({ children }) => {
     checkLoginStatus();
   }, [checkLoginStatus]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
-
   const login = async (email, password) => {
     try {
       console.log("Attempting login...");
@@ -71,14 +60,15 @@ export const AuthProvider = ({ children }) => {
         password,
       });
       console.log("Login response:", response.data);
-      if (response.data.success) {
+      if (response.data.success && response.data.data && response.data.data.token) {
         localStorage.setItem("token", response.data.data.token);
-
         setIsLoggedIn(true);
         setUser(response.data.data.user);
-        setUserName(response.data.data.user.name);
-        setUserRole(response.data.data.user.role);
+        setUserName(response.data.data.user.name || "");
+        setUserRole(response.data.data.user.role || "");
         await checkLoginStatus();
+      } else {
+        throw new Error("Invalid login response");
       }
       return response.data;
     } catch (error) {
