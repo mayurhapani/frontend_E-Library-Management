@@ -9,6 +9,7 @@ import GlobalLoader from "./components/GlobalLoader.jsx";
 import Signup from "./pages/Signup.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ManageBooks from "./pages/ManageBooks.jsx";
 
 function App() {
   const { loading } = useContext(AuthContext);
@@ -26,6 +27,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/signin" element={<Signin />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/books" element={<ManageBooks />} />
             </Routes>
           )}
         </main>

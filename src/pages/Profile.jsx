@@ -20,7 +20,7 @@ export default function Profile() {
 
   const fetchUserData = useCallback(async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/v1/users/getUser`, {
+      const response = await axios.get(`${BASE_URL}/users/getUser`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setName(response.data.data.name);
@@ -58,7 +58,7 @@ export default function Profile() {
   const confirmDeleteAccount = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${BASE_URL}/api/v1/users/delete/${user?._id}`, {
+      await axios.delete(`${BASE_URL}/users/delete/${user?._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -79,7 +79,7 @@ export default function Profile() {
     try {
       const token = localStorage.getItem("token");
       await axios.patch(
-        `${BASE_URL}/api/v1/users/update/${user?._id}`,
+        `${BASE_URL}/users/update/${user?._id}`,
         { name, email },
         { headers: { Authorization: `Bearer ${token}` } }
       );

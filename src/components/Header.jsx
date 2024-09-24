@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthProvider";
 import { FaUser, FaSignOutAlt, FaCaretDown, FaBook } from "react-icons/fa";
 
 export default function Header() {
-  const { isLoggedIn, userName, logout } = useContext(AuthContext);
+  const { isLoggedIn, userName, userRole, logout } = useContext(AuthContext);
   const [logoutModal, setLogoutModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -13,6 +13,8 @@ export default function Header() {
     setLogoutModal(false);
     setShowUserMenu(false);
   };
+
+  const isAdmin = userRole === 'admin';
 
   return (
     <>
@@ -33,14 +35,16 @@ export default function Header() {
                     Home
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/books"
-                    className="text-white hover:text-indigo-200 transition duration-300"
-                  >
-                    Books
-                  </Link>
-                </li>
+                {isLoggedIn && isAdmin && (
+                  <li>
+                    <Link
+                      to="/books"
+                      className="text-white hover:text-indigo-200 transition duration-300"
+                    >
+                      Manage Books
+                    </Link>
+                  </li>
+                )}
                 {isLoggedIn ? (
                   <li className="relative">
                     <button

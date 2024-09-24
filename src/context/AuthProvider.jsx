@@ -10,6 +10,8 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [userRole, setUserRole] = useState(""); // Add this line
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -25,6 +27,8 @@ export const AuthProvider = ({ children }) => {
         });
         setUser(response.data.data);
         setIsLoggedIn(true);
+        setUserName(response.data.data.name);
+        setUserRole(response.data.data.role); // Add this line
       } else {
         setIsLoggedIn(false);
         setUser(null);
@@ -63,6 +67,8 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("token", response.data.data.token); // Store the token
         setIsLoggedIn(true);
         setUser(response.data.data.user);
+        setUserName(response.data.data.user.name);
+        setUserRole(response.data.data.user.role); // Add this line
         await checkLoginStatus(); // This will update the user state with the most recent data
       }
       return response.data;
@@ -86,7 +92,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, loading, setLoading, login, logout, checkLoginStatus }}>
+    <AuthContext.Provider
+      value={{
+        isLoggedIn,
+        userName,
+        userRole,
+        user,
+        loading,
+        setLoading,
+        login,
+        logout,
+        checkLoginStatus,
+      }}
+    >
       {loading && <GlobalLoader />}
       {children}
     </AuthContext.Provider>

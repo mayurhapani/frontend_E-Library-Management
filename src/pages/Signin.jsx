@@ -38,7 +38,9 @@ const Signin = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              placeholder="Enter your email"
               required
             />
           </div>
@@ -51,7 +53,9 @@ const Signin = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              placeholder="Enter your password"
               required
             />
           </div>
@@ -63,7 +67,7 @@ const Signin = () => {
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-gray-600">
-          Don&#39;t have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link to="/signup" className="text-indigo-600 hover:text-indigo-500">
             Sign Up
           </Link>
