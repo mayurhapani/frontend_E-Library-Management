@@ -15,7 +15,7 @@ export default function Home() {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   const fetchBorrowedBooks = useCallback(async () => {
-    if (isLoggedIn) {
+    if (isLoggedIn && user) {
       try {
         const response = await axios.get(`${BASE_URL}/users/getUser`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -26,7 +26,7 @@ export default function Home() {
         console.error("Error fetching borrowed books:", error);
       }
     }
-  }, [BASE_URL, isLoggedIn]);
+  }, [BASE_URL, isLoggedIn, user]);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -43,8 +43,10 @@ export default function Home() {
     };
 
     fetchBooks();
-    fetchBorrowedBooks();
-  }, [BASE_URL, isLoggedIn, fetchBorrowedBooks]);
+    if (isLoggedIn && user) {
+      fetchBorrowedBooks();
+    }
+  }, [BASE_URL, isLoggedIn, user, fetchBorrowedBooks]);
 
   const handleBookBorrowed = useCallback((borrowedBookId) => {
     setBorrowedBookIds((prevIds) => [...prevIds, borrowedBookId]);

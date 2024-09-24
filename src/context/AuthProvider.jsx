@@ -21,10 +21,12 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
+      console.log("Checking login status, token:", token ? "exists" : "not found");
       if (token) {
         const response = await axios.get(`${BASE_URL}/users/getUser`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        console.log("User data response:", response.data);
         if (response.data && response.data.data) {
           setUser(response.data.data);
           setIsLoggedIn(true);
@@ -66,7 +68,6 @@ export const AuthProvider = ({ children }) => {
         setUser(response.data.data.user);
         setUserName(response.data.data.user.name || "");
         setUserRole(response.data.data.user.role || "");
-        await checkLoginStatus();
       } else {
         throw new Error("Invalid login response");
       }
