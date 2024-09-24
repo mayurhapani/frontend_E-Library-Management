@@ -9,26 +9,18 @@ Currently, two official plugins are available:
 
 VITE_BASE_URL=http://localhost:8001
 
-live url = https://swiftrut-task3-frontend.vercel.app/
+live url =
 
-admin email = mayur@gmail.com
+admin email = hapanimayur@gmail.com
 password = Mayur@123
-
-for import / export
-go to profile page // you can find options there for import and export
-You can select CSV file to import data
-suggestion = before import data export old data for data format then update that file
 
 by default user roll = user
 only one admin // can not register new admin for security
 
-admin can see all the posts of the other users also can update status of task
-on home page user can see all task given by admin and created by self
+on home page user can see all books given by admin
 
-only admin have right to assign task to other users // there is function in admin route can
-fetch other users while adding tasks
+only admin have right to create new book and create CRUD with books
 
-task will automatically arranged by its category (priority)
-if task marks as done it automatically goes at down side of list
+user can borrow book and see their profile page which have list of all books borrowed by user
 
-user can see which tasks are given by admin (by : @admin)
+user cab borrow books after login

@@ -16,7 +16,7 @@ const BookCard = ({
   returningBookId,
   isProfilePage,
 }) => {
-  const { userRole } = useContext(AuthContext);
+  const { userRole, isLoggedIn } = useContext(AuthContext);
   const isAdmin = userRole === "admin";
   const navigate = useNavigate();
   const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -44,7 +44,12 @@ const BookCard = ({
   };
 
   const handleBorrowClick = () => {
-    setShowBorrowModal(true);
+    if (isLoggedIn) {
+      setShowBorrowModal(true);
+    } else {
+      toast.error("Please log in to borrow books");
+      navigate("/signin");
+    }
   };
 
   const handleBorrowSuccess = () => {
@@ -52,6 +57,76 @@ const BookCard = ({
     if (onBookBorrowed) {
       onBookBorrowed(book._id);
     }
+  };
+
+  const renderActionButtons = () => {
+    if (isAdmin && isProfilePage) {
+      return (
+        <div className="flex space-x-2">
+          <button
+            onClick={handleEditBook}
+            className="text-yellow-500 hover:text-yellow-600 transition duration-300"
+            title="Edit book"
+          >
+            <FaEdit size={16} />
+          </button>
+          <button
+            onClick={handleDeleteBook}
+            className="text-red-500 hover:text-red-600 transition duration-300"
+            title="Delete book"
+          >
+            <FaTrash size={16} />
+          </button>
+        </div>
+      );
+    }
+
+    if (isProfilePage && isBorrowed) {
+      return (
+        <div className="flex justify-between items-center w-full">
+          <button
+            onClick={() => onReturnBook(book._id)}
+            disabled={returningBookId === book._id}
+            className={`inline-block bg-green-500 text-white px-3 py-1 text-sm rounded-md hover:bg-green-600 transition duration-300 ${
+              returningBookId === book._id ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {returningBookId === book._id ? "Returning..." : "Return Book"}
+          </button>
+          <button
+            onClick={() => navigate(`/books/${book?._id}`)}
+            className="inline-block bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600 transition duration-300"
+          >
+            View Details
+          </button>
+        </div>
+      );
+    }
+
+    if (isBorrowed) {
+      return (
+        <button
+          onClick={() => navigate(`/books/${book?._id}`)}
+          className="inline-block bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600 transition duration-300"
+        >
+          View Details
+        </button>
+      );
+    }
+
+    if (isLoggedIn) {
+      return (
+        <button
+          onClick={handleBorrowClick}
+          className="inline-block bg-green-500 text-white px-3 py-1 text-sm rounded-md hover:bg-green-600 transition duration-300"
+        >
+          Borrow
+        </button>
+      );
+    }
+
+    // If not logged in, don't show any button
+    return null;
   };
 
   return (
@@ -65,66 +140,7 @@ const BookCard = ({
           <p className="text-sm text-gray-600">by {book?.author}</p>
           <p className="text-xs text-gray-500">{book?.genre}</p>
         </div>
-        <div className="flex justify-between items-center">
-          {isAdmin ? (
-            <>
-              <button
-                onClick={() => navigate(`/books/${book?._id}`)}
-                className="inline-block bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600 transition duration-300"
-              >
-                View Details
-              </button>
-              <div className="flex space-x-2">
-                <button
-                  onClick={handleEditBook}
-                  className="text-yellow-500 hover:text-yellow-600 transition duration-300"
-                  title="Edit book"
-                >
-                  <FaEdit size={16} />
-                </button>
-                <button
-                  onClick={handleDeleteBook}
-                  className="text-red-500 hover:text-red-600 transition duration-300"
-                  title="Delete book"
-                >
-                  <FaTrash size={16} />
-                </button>
-              </div>
-            </>
-          ) : isProfilePage && isBorrowed ? (
-            <>
-              <button
-                onClick={() => navigate(`/books/${book?._id}`)}
-                className="inline-block bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600 transition duration-300"
-              >
-                View Details
-              </button>
-              <button
-                onClick={() => onReturnBook(book._id)}
-                disabled={returningBookId === book._id}
-                className={`inline-block bg-green-500 text-white px-3 py-1 text-sm rounded-md hover:bg-green-600 transition duration-300 ${
-                  returningBookId === book._id ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                {returningBookId === book._id ? "Returning..." : "Return Book"}
-              </button>
-            </>
-          ) : isBorrowed ? (
-            <button
-              onClick={() => navigate(`/books/${book?._id}`)}
-              className="inline-block bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600 transition duration-300"
-            >
-              View Details
-            </button>
-          ) : (
-            <button
-              onClick={handleBorrowClick}
-              className="inline-block bg-green-500 text-white px-3 py-1 text-sm rounded-md hover:bg-green-600 transition duration-300"
-            >
-              Borrow
-            </button>
-          )}
-        </div>
+        <div className="flex justify-between items-center">{renderActionButtons()}</div>
       </div>
       {showBorrowModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
