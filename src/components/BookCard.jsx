@@ -35,15 +35,23 @@ const BookCard = ({ book, onBookDeleted }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105">
-      <img src={book?.image} alt={book?.title} className="w-full h-48 object-cover" />
+      <div className="h-80 bg-gray-100 flex items-center justify-center">
+        <img 
+          src={book?.image} 
+          alt={book?.title} 
+          className="max-w-full max-h-full object-contain"
+        />
+      </div>
       <div className="p-4">
-        <h2 className="text-xl font-semibold mb-2 text-gray-800">{book?.title}</h2>
-        <p className="text-gray-600 mb-2">by {book?.author}</p>
-        <p className="text-sm text-gray-500 mb-4">{book?.genre}</p>
+        <h2 className="text-xl font-semibold mb-2 text-gray-800 truncate">{book?.title}</h2>
+        <div className="flex justify-between items-center mb-2">
+          <p className="text-sm text-gray-600">by {book?.author}</p>
+          <p className="text-xs text-gray-500">{book?.genre}</p>
+        </div>
         <div className="flex justify-between items-center">
           <Link
             to={`/books/${book?._id}`}
-            className="inline-block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300"
+            className="inline-block bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600 transition duration-300"
           >
             View Details
           </Link>
@@ -54,14 +62,14 @@ const BookCard = ({ book, onBookDeleted }) => {
                 className="text-yellow-500 hover:text-yellow-600 transition duration-300"
                 title="Edit book"
               >
-                <FaEdit size={20} />
+                <FaEdit size={16} />
               </button>
               <button
                 onClick={handleDeleteBook}
                 className="text-red-500 hover:text-red-600 transition duration-300"
                 title="Delete book"
               >
-                <FaTrash size={20} />
+                <FaTrash size={16} />
               </button>
             </div>
           )}

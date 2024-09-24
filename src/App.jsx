@@ -10,7 +10,8 @@ import Signup from "./pages/Signup.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ManageBooks from "./pages/ManageBooks.jsx";
-import BookDetails from './components/BookDetails';  // or './pages/BookDetails' depending on your file structure
+import BookDetails from "./components/BookDetails";
+import EditBook from "./pages/EditBook";
 
 function App() {
   const { loading } = useContext(AuthContext);
@@ -30,6 +31,7 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/books" element={<ManageBooks />} />
               <Route path="/books/:id" element={<BookDetails />} />
+              <Route path="/edit-book/:id" element={<EditBook />} />
             </Routes>
           )}
         </main>
