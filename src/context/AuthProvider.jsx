@@ -17,11 +17,37 @@ export const AuthProvider = ({ children }) => {
 
   const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+  const getToken = () => {
+    try {
+      return localStorage.getItem("token");
+    } catch (error) {
+      console.error("Error accessing localStorage:", error);
+      return null;
+    }
+  };
+
+  const setToken = (token) => {
+    try {
+      localStorage.setItem("token", token);
+    } catch (error) {
+      console.error("Error setting token in localStorage:", error);
+    }
+  };
+
+  const removeToken = () => {
+    try {
+      localStorage.removeItem("token");
+    } catch (error) {
+      console.error("Error removing token from localStorage:", error);
+    }
+  };
+
   const checkLoginStatus = useCallback(async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
+      const token = getToken();
       console.log("Checking login status, token:", token ? "exists" : "not found");
+
       if (token) {
         const response = await axios.get(`${BASE_URL}/users/getUser`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -36,7 +62,11 @@ export const AuthProvider = ({ children }) => {
           throw new Error("Invalid user data received");
         }
       } else {
-        throw new Error("No token found");
+        console.log("No token found, user is not logged in");
+        setIsLoggedIn(false);
+        setUser(null);
+        setUserName("");
+        setUserRole("");
       }
     } catch (error) {
       console.error("Error checking login status:", error);
@@ -44,7 +74,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setUserName("");
       setUserRole("");
-      // localStorage.removeItem("token");
+      removeToken();
     } finally {
       setLoading(false);
     }
@@ -63,11 +93,13 @@ export const AuthProvider = ({ children }) => {
       });
       console.log("Login response:", response.data);
       if (response.data.success && response.data.data && response.data.data.token) {
-        localStorage.setItem("token", response.data.data.token);
+        setToken(response.data.data.token);
         setIsLoggedIn(true);
         setUser(response.data.data.user);
         setUserName(response.data.data.user.name || "");
         setUserRole(response.data.data.user.role || "");
+        // Perform an immediate check to ensure the token is set
+        await checkLoginStatus();
       } else {
         throw new Error("Invalid login response");
       }
@@ -82,7 +114,7 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log("Attempting logout...");
       await axios.get(`${BASE_URL}/users/logout`, { withCredentials: true });
-      localStorage.removeItem("token");
+      removeToken();
       setIsLoggedIn(false);
       setUser(null);
       setUserName("");
@@ -92,7 +124,7 @@ export const AuthProvider = ({ children }) => {
       console.error("Logout error:", error.response ? error.response.data : error.message);
     } finally {
       // Ensure state is reset even if the logout request fails
-      localStorage.removeItem("token");
+      removeToken();
       setIsLoggedIn(false);
       setUser(null);
       setUserName("");
