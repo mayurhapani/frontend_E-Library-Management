@@ -7,6 +7,8 @@ import Profile from "./pages/Profile.jsx";
 import Signin from "./pages/Signin.jsx";
 import GlobalLoader from "./components/GlobalLoader.jsx";
 import Signup from "./pages/Signup.jsx";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const { loading } = useContext(AuthContext);
@@ -27,6 +29,7 @@ function App() {
             </Routes>
           )}
         </main>
+        <ToastContainer />
       </div>
     </Router>
   );

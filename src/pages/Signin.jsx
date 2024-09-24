@@ -1,43 +1,25 @@
-import { useContext, useState } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/AuthProvider";
 
-export default function Signin() {
+const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const notify1 = (msg) => toast.error(msg);
-  const notify2 = (msg) => toast.success(msg);
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const passwordRegex = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/;
-
-  const loginData = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!emailRegex.test(email)) {
-      notify1("Invalid email format");
-      return;
-    }
-    if (!passwordRegex.test(password)) {
-      notify1(
-        "Invalid password format. Password must be 8-16 characters long and include a number, lowercase letter, uppercase letter, and special character."
-      );
-      return;
-    }
-
     try {
-      const response = await login(email, password);
-      notify2(response.message);
+      await login(email, password);
+      toast.success("Logged in successfully!");
       navigate("/");
     } catch (error) {
       if (error.response) {
-        notify1(error.response.data.message);
+        toast.error(error.response.data.message);
       } else {
-        notify1(error.message);
+        toast.error("An error occurred during login");
       }
     }
   };
@@ -46,7 +28,7 @@ export default function Signin() {
     <div className="bg-gradient-to-r from-blue-100 to-indigo-100 min-h-screen flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-3xl font-bold text-center text-indigo-700 mb-6">E-Library Sign In</h1>
-        <form className="space-y-4" onSubmit={loginData}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email
@@ -89,4 +71,6 @@ export default function Signin() {
       </div>
     </div>
   );
-}
+};
+
+export default Signin;
