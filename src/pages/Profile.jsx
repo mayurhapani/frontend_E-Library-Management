@@ -39,7 +39,7 @@ export default function Profile() {
       console.error("Error fetching user data:", error);
       toast.error("Failed to fetch user data");
     } finally {
-      setIsLoading(false); // Set loading to false after data is fetched
+      setIsLoading(false);
     }
   }, [BASE_URL]);
 
@@ -65,7 +65,6 @@ export default function Profile() {
     return null;
   }
 
-  // Show loading indicator while data is being fetched
   if (isLoading) {
     return <GlobalLoader />;
   }
@@ -121,8 +120,9 @@ export default function Profile() {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
       );
+
       toast.success("Book returned successfully");
-      fetchUserData(); // Refresh the borrowed books list
+      fetchUserData();
     } catch (error) {
       console.error("Error returning book:", error);
       toast.error("Failed to return book");

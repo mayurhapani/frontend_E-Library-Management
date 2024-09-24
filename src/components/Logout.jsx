@@ -30,7 +30,6 @@ export default function Logout() {
           localStorage.removeItem("token");
           localStorage.removeItem("id");
 
-          // Attempt to remove cookies with specific attributes
           cookies.remove("token", { path: "/", sameSite: "None", secure: true });
           cookies.remove("token");
 

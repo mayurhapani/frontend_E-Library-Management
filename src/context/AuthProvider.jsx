@@ -64,12 +64,12 @@ export const AuthProvider = ({ children }) => {
       });
       console.log("Login response:", response.data);
       if (response.data.success) {
-        localStorage.setItem("token", response.data.data.token); // Store the token
+        localStorage.setItem("token", response.data.data.token);
         setIsLoggedIn(true);
         setUser(response.data.data.user);
         setUserName(response.data.data.user.name);
-        setUserRole(response.data.data.user.role); // Add this line
-        await checkLoginStatus(); // This will update the user state with the most recent data
+        setUserRole(response.data.data.user.role);
+        await checkLoginStatus();
       }
       return response.data;
     } catch (error) {
@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log("Attempting logout...");
       await axios.get(`${BASE_URL}/users/logout`, { withCredentials: true });
-      localStorage.removeItem("token"); // Clear the token
+      localStorage.removeItem("token");
       setIsLoggedIn(false);
       setUser(null);
       console.log("Logout successful");

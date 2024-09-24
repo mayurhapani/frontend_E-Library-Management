@@ -101,8 +101,6 @@ const ManageBooks = () => {
 
   return (
     <div className="container mx-auto px-4 py-20">
-      {" "}
-      {/* Changed py-8 to py-20 */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Manage Books</h1>
         <button
