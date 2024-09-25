@@ -52,9 +52,9 @@ export const AuthProvider = ({ children }) => {
         const response = await axios.get(`${BASE_URL}/users/getUser`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("User data response:", response);
+        console.log("User data response:", response.data);
 
-        if (response?.data?.success && response?.data?.data) {
+        if (response.data.success && response.data.data) {
           const userData = response.data.data;
           console.log("User data:", userData);
 
@@ -105,8 +105,10 @@ export const AuthProvider = ({ children }) => {
         setUserName(response.data.data.user.name || "");
         setUserRole(response.data.data.user.role || "");
 
-        // Perform an immediate check to ensure the token is set
-        await checkLoginStatus();
+        // Add a small delay before checking login status
+        setTimeout(async () => {
+          await checkLoginStatus();
+        }, 1000);
       } else {
         console.error("Invalid login response structure:", response.data);
         throw new Error("Invalid login response");
