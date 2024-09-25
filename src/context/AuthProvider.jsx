@@ -92,10 +92,16 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       console.log("Attempting login...");
-      const response = await axios.post(`${BASE_URL}/users/login`, {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        `${BASE_URL}/users/login`,
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
       console.log("Login response:", response.data);
 
       if (response.data.success && response.data.data && response.data.data.token) {
