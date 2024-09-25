@@ -139,10 +139,22 @@ const BookCard = ({
     return null;
   };
 
+  // Function to ensure HTTPS
+  const ensureHttps = (url) => {
+    if (url && url.startsWith("http://")) {
+      return url.replace("http://", "https://");
+    }
+    return url;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105">
       <div className="h-80 bg-gray-100 flex items-center justify-center">
-        <img src={book?.image} alt={book?.title} className="max-w-full max-h-full object-contain" />
+        <img
+          src={ensureHttps(book?.image)}
+          alt={book?.title}
+          className="max-w-full max-h-full object-contain"
+        />
       </div>
       <div className="p-4">
         <h2 className="text-xl font-semibold mb-2 text-gray-800 truncate">{book?.title}</h2>

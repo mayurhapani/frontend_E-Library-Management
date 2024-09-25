@@ -52,13 +52,18 @@ export const AuthProvider = ({ children }) => {
         const response = await axios.get(`${BASE_URL}/users/getUser`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("User data response:", response.data);
-        if (response?.data && response?.data?.data) {
-          setUser(response?.data?.data);
+        console.log("User data response:", response);
+
+        if (response?.data?.success && response?.data?.data) {
+          const userData = response.data.data;
+          console.log("User data:", userData);
+
+          setUser(userData);
           setIsLoggedIn(true);
-          setUserName(response?.data?.data?.name || "");
-          setUserRole(response?.data?.data?.role || "");
+          setUserName(userData.name || "");
+          setUserRole(userData.role || "");
         } else {
+          console.error("Invalid user data structure:", response.data);
           throw new Error("Invalid user data received");
         }
       } else {
@@ -92,15 +97,18 @@ export const AuthProvider = ({ children }) => {
         password,
       });
       console.log("Login response:", response.data);
+
       if (response.data.success && response.data.data && response.data.data.token) {
         setToken(response.data.data.token);
         setIsLoggedIn(true);
         setUser(response.data.data.user);
         setUserName(response.data.data.user.name || "");
         setUserRole(response.data.data.user.role || "");
+
         // Perform an immediate check to ensure the token is set
         await checkLoginStatus();
       } else {
+        console.error("Invalid login response structure:", response.data);
         throw new Error("Invalid login response");
       }
       return response.data;
